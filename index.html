@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>无聊神社 · 给洋洋</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23c0453c'/%3E%3Cpath d='M16 5l9 6v4H7v-4z' fill='%23fff'/%3E%3Crect x='7' y='16' width='18' height='11' rx='1.5' fill='%23fff'/%3E%3Crect x='14' y='19' width='4' height='8' fill='%23c0453c'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --card:#ffffff;
+    --text:#1c2230;
+    --muted:#7b7f8a;
+    --ok:#3f7d5c;
+    --gold:#c8992f;
+    /* 昼（默认） */
+    --paper:#f8f5ef;
+    --pl:#f2ece1;
+    --pw:#fdfcfa;
+    --accent:#2b4a78;
+    --accent2:#3f6ba8;
+    --seal:#c0453c;
+    --line:#eae3d6;
+    --serif:"Noto Serif SC","Source Han Serif SC","Yu Mincho","Songti SC",SimSun,serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    --jp:"Noto Sans JP","Yu Gothic","Meiryo","Hiragino Kaku Gothic ProN",sans-serif;
+  }
+  /* 朝 */
+  body[data-period="morning"]{
+    --paper:#fdf7f0; --pl:#f8ecdc; --pw:#fffdfa;
+    --accent:#c2683a; --accent2:#e0a06a;
+    --line:#f0e1cf;
+  }
+  /* 夜 */
+  body[data-period="night"]{
+    --paper:#f2f4f9; --pl:#e6eaf4; --pw:#fbfcfe;
+    --accent:#3f4a8c; --accent2:#6d6fb5;
+    --line:#e1e5f0;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:var(--sans);
+    color:var(--text);
+    background:var(--paper);
+    -webkit-font-smoothing:antialiased;
+    display:flex;
+    justify-content:center;
+    padding:38px 20px 60px;
+    transition:background .6s ease;
+  }
+  /* 底纹：昼=青海波 / 朝=霞 / 夜=星 */
+  body::before{
+    content:"";
+    position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.45;
+    background-image:
+      radial-gradient(circle at 100% 150%, var(--pl) 24%, var(--pw) 25%, var(--pw) 28%, var(--pl) 29%, var(--pl) 36%, var(--pw) 36%, var(--pw) 40%, transparent 40%, transparent),
+      radial-gradient(circle at 0    150%, var(--pl) 24%, var(--pw) 25%, var(--pw) 28%, var(--pl) 29%, var(--pl) 36%, var(--pw) 36%, var(--pw) 40%, transparent 40%, transparent),
+      radial-gradient(circle at 50%  100%, var(--pw) 10%, var(--pl) 11%, var(--pl) 23%, var(--pw) 24%, var(--pw) 30%, var(--pl) 31%, var(--pl) 43%, var(--pw) 44%, var(--pw) 50%, var(--pl) 51%, var(--pl) 63%, var(--pw) 64%, var(--pw) 71%, transparent 71%, transparent),
+      radial-gradient(circle at 100% 50%, var(--pw) 5%, var(--pl) 6%, var(--pl) 15%, var(--pw) 16%, var(--pw) 20%, var(--pl) 21%, var(--pl) 30%, var(--pw) 31%, var(--pw) 35%, var(--pl) 36%, var(--pl) 45%, var(--pw) 46%, var(--pw) 49%, transparent 50%, transparent),
+      radial-gradient(circle at 0    50%, var(--pw) 5%, var(--pl) 6%, var(--pl) 15%, var(--pw) 16%, var(--pw) 20%, var(--pl) 21%, var(--pl) 30%, var(--pw) 31%, var(--pw) 35%, var(--pl) 36%, var(--pl) 45%, var(--pw) 46%, var(--pw) 49%, transparent 50%, transparent);
+    background-size:100px 50px;
+    transition:opacity .6s ease;
+  }
+  body[data-period="morning"]::before{
+    opacity:.9;
+    background-image:
+      linear-gradient(180deg, rgba(224,160,106,.20), rgba(224,160,106,0) 42%),
+      repeating-linear-gradient(180deg, rgba(194,104,58,.045) 0 1px, transparent 1px 30px);
+    background-size:100% 100%, 100% 30px;
+  }
+  body[data-period="night"]::before{
+    opacity:.85;
+    background-image:
+      radial-gradient(circle at 22% 14%, rgba(109,111,181,.42) 0 1.6px, transparent 2.2px),
+      radial-gradient(circle at 74% 30%, rgba(109,111,181,.34) 0 1.2px, transparent 1.8px),
+      radial-gradient(circle at 46% 66%, rgba(109,111,181,.28) 0 1px, transparent 1.6px),
+      radial-gradient(circle at 88% 78%, rgba(109,111,181,.36) 0 1.4px, transparent 2px),
+      radial-gradient(circle at 12% 86%, rgba(109,111,181,.3) 0 1.1px, transparent 1.7px);
+    background-size:320px 300px;
+  }
+  .wrap{width:100%;max-width:700px;position:relative;z-index:1;}
+
+  /* ---------- 社号 ---------- */
+  header{position:relative;margin-bottom:20px;padding-right:56px;}
+  .seal{
+    position:absolute;top:2px;right:0;width:42px;height:42px;border-radius:9px;
+    background:linear-gradient(150deg,var(--seal),#d97757);
+    color:#fff;font-family:var(--serif);font-size:23px;line-height:1;
+    display:flex;align-items:center;justify-content:center;
+    transform:rotate(-6deg);
+    box-shadow:0 6px 16px rgba(192,69,60,.26);
+  }
+  .kicker{
+    display:inline-block;font-size:12px;letter-spacing:.16em;
+    color:var(--seal);background:rgba(192,69,60,.07);
+    border:1px solid rgba(192,69,60,.16);
+    padding:4px 10px;border-radius:999px;margin-bottom:13px;
+  }
+  h1{
+    font-family:var(--serif);font-size:35px;line-height:1.15;
+    margin:0 0 7px;letter-spacing:.02em;font-weight:700;
+  }
+  h1 span{
+    background:linear-gradient(92deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;
+  }
+  .jp-sub{
+    font-family:var(--jp);font-size:13.5px;letter-spacing:.16em;
+    color:var(--accent);opacity:.62;margin:0 0 12px;
+  }
+  .sub{margin:0;color:var(--muted);font-size:14.5px;line-height:1.75;}
+
+  /* ---------- 时段条 ---------- */
+  .period-bar{
+    display:flex;align-items:center;gap:10px;
+    background:#fff;border:1px solid var(--line);border-radius:12px;
+    padding:10px 14px;margin-bottom:18px;
+    box-shadow:0 1px 2px rgba(28,34,48,.03);
+  }
+  .sky{
+    flex:0 0 auto;width:22px;height:22px;border-radius:50%;
+    background:linear-gradient(150deg,var(--accent2),var(--accent));
+    position:relative;
+  }
+  body[data-period="morning"] .sky{background:linear-gradient(150deg,#f0b070,#e07a3c);box-shadow:0 0 0 4px rgba(224,160,106,.20);}
+  body[data-period="night"] .sky{background:linear-gradient(150deg,#8b8fd0,#3f4a8c);box-shadow:0 0 0 4px rgba(109,111,181,.16);}
+  body[data-period="night"] .sky::after{
+    content:"";position:absolute;top:1px;left:-3px;width:17px;height:17px;
+    border-radius:50%;background:#fff;
+  }
+  .period-jp{font-family:var(--jp);font-size:14px;font-weight:700;letter-spacing:.08em;}
+  .period-note{font-size:12.5px;color:var(--muted);margin-left:auto;text-align:right;}
+
+  /* ---------- 分类 ---------- */
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
+  .chip{
+    appearance:none;border:1px solid var(--line);background:#fff;color:var(--muted);
+    font-size:13.5px;font-family:inherit;padding:7px 14px;border-radius:999px;
+    cursor:pointer;transition:.18s ease;
+  }
+  .chip:hover{border-color:#d9cfbc;color:var(--text);}
+  .chip.on{
+    background:linear-gradient(92deg,var(--accent),var(--accent2));
+    border-color:transparent;color:#fff;
+    box-shadow:0 6px 16px rgba(43,74,120,.24);
+  }
+
+  /* ---------- 签筒 ---------- */
+  .draw{display:flex;flex-direction:column;align-items:center;margin-bottom:20px;}
+  .omikuji{position:relative;width:130px;height:176px;}
+  .omikuji.shaking{animation:shake .22s ease-in-out 2;}
+  @keyframes shake{
+    0%,100%{transform:translateX(0) rotate(0);}
+    25%{transform:translateX(-5px) rotate(-3deg);}
+    75%{transform:translateX(5px) rotate(3deg);}
+  }
+  .sticks{position:absolute;bottom:118px;left:50%;transform:translateX(-50%);display:flex;gap:6px;align-items:flex-end;}
+  .sticks i{
+    display:block;width:7px;height:44px;border-radius:3px 3px 0 0;
+    background:linear-gradient(180deg,#f6ecd8,#dfcead);
+    transform-origin:bottom center;
+  }
+  .sticks i:nth-child(1){transform:rotate(-9deg);}
+  .sticks i:nth-child(2){transform:rotate(-3deg);height:52px;}
+  .sticks i:nth-child(3){transform:rotate(3deg);height:48px;}
+  .sticks i:nth-child(4){transform:rotate(9deg);}
+  .tub{
+    position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+    width:100px;height:130px;border-radius:9px 9px 16px 16px;
+    background:linear-gradient(170deg,#c9503f,#9c332c 62%,#7e2823);
+    box-shadow:0 12px 26px rgba(140,45,38,.26), inset 0 -8px 20px rgba(0,0,0,.18);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .tub::before{
+    content:"";position:absolute;top:7px;left:50%;transform:translateX(-50%);
+    width:70%;height:9px;border-radius:5px;background:#6d211c;
+    box-shadow:inset 0 2px 4px rgba(0,0,0,.5);
+  }
+  .tub span{
+    writing-mode:vertical-rl;text-orientation:upright;
+    font-family:var(--serif);font-size:19px;letter-spacing:.22em;
+    color:#f6e9d2;opacity:.92;
+  }
+  .draw-hint{font-size:12.5px;color:var(--muted);margin:14px 0 12px;letter-spacing:.06em;}
+
+  /* ---------- 御籤结果 ---------- */
+  .result{
+    display:flex;gap:22px;align-items:stretch;
+    background:var(--card);border:1px solid var(--line);border-radius:20px;
+    box-shadow:0 1px 2px rgba(28,34,48,.04), 0 14px 34px rgba(28,34,48,.07);
+    padding:26px 26px 26px 24px;position:relative;overflow:hidden;
+  }
+  .result::before{
+    content:"";position:absolute;inset:0 auto 0 0;width:4px;
+    background:linear-gradient(180deg,var(--seal),#d97757);
+  }
+  .result.reveal{animation:slipIn .42s cubic-bezier(.2,.8,.25,1);}
+  @keyframes slipIn{
+    from{opacity:0;transform:translateY(26px) rotate(-3deg) scale(.965);}
+    to{opacity:1;transform:none;}
+  }
+  .result.daikichi{box-shadow:0 0 0 2px rgba(200,153,47,.42), 0 16px 40px rgba(192,69,60,.18);}
+
+  .slip{
+    flex:0 0 auto;width:66px;border-radius:7px;
+    background:linear-gradient(180deg,#fffdf6,#faf3e4);
+    border:1.5px solid rgba(192,69,60,.45);
+    padding:14px 8px;display:flex;flex-direction:column;
+    align-items:center;justify-content:space-between;gap:10px;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.7);
+  }
+  .slip-fortune{
+    writing-mode:vertical-rl;text-orientation:upright;
+    font-family:var(--serif);font-size:30px;font-weight:700;
+    letter-spacing:.14em;color:var(--seal);line-height:1;
+  }
+  .slip.f-ki .slip-fortune,.slip.f-sho .slip-fortune{color:var(--accent);}
+  .slip.f-sue .slip-fortune,.slip.f-kyo .slip-fortune{color:#8a8f9c;}
+  .slip-seal{
+    width:24px;height:24px;border-radius:5px;background:rgba(192,69,60,.86);
+    color:#fff;font-family:var(--serif);font-size:14px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .slip.f-sue .slip-seal,.slip.f-kyo .slip-seal{background:rgba(138,143,156,.85);}
+
+  .result-body{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;}
+  .tag{
+    font-size:12.5px;letter-spacing:.04em;color:var(--muted);
+    margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  }
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--seal);flex:0 0 auto;}
+  .lim{
+    font-size:11.5px;padding:2px 7px;border-radius:5px;
+    background:rgba(43,74,120,.08);color:var(--accent);
+  }
+  .task{
+    font-size:22px;line-height:1.5;font-weight:600;letter-spacing:-.01em;
+    transition:opacity .16s ease, transform .16s ease;
+  }
+  .task.rolling{opacity:.32;transform:translateY(3px);}
+  .task.idle{color:var(--muted);font-weight:500;font-size:18px;}
+  .exp-badge{
+    display:inline-flex;align-items:center;gap:6px;align-self:flex-start;
+    margin-top:14px;font-size:12.5px;font-weight:700;letter-spacing:.04em;
+    color:var(--accent);background:rgba(43,74,120,.07);
+    border:1px solid rgba(43,74,120,.14);border-radius:999px;padding:4px 11px;
+  }
+  .result.daikichi .exp-badge{color:#9a6f14;background:rgba(200,153,47,.12);border-color:rgba(200,153,47,.34);}
+
+  .pin{
+    position:absolute;top:16px;right:16px;
+    font-family:inherit;font-size:12.5px;color:var(--accent);
+    background:rgba(43,74,120,.06);border:1px solid rgba(43,74,120,.14);
+    border-radius:999px;padding:5px 12px;cursor:pointer;transition:.18s ease;
+  }
+  .pin:hover:not(:disabled){background:rgba(43,74,120,.11);}
+  .pin:disabled{color:#b3b7c0;background:#f4f5f7;border-color:#eceef1;cursor:default;}
+
+  .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;}
+  .btn{
+    font-family:inherit;font-size:15px;font-weight:600;
+    padding:13px 26px;border-radius:13px;border:1px solid transparent;
+    cursor:pointer;transition:.18s ease;
+  }
+  .btn.primary{
+    background:linear-gradient(92deg,var(--accent),var(--accent2));
+    color:#fff;box-shadow:0 8px 22px rgba(43,74,120,.24);
+  }
+  .btn.primary:hover{transform:translateY(-1px);box-shadow:0 12px 26px rgba(43,74,120,.3);}
+  .btn.primary:active{transform:translateY(0);}
+  .btn.ghost{background:#fff;border-color:var(--line);color:var(--text);}
+  .btn.ghost:hover:not(:disabled){border-color:#d9cfbc;}
+  .btn:disabled{opacity:.42;cursor:not-allowed;}
+
+  .progress{
+    margin-top:14px;display:none;align-items:center;gap:14px;
+    background:#fff;border:1px solid var(--line);border-radius:13px;
+    padding:11px 16px;box-shadow:0 1px 2px rgba(28,34,48,.03);
+  }
+  .progress.show{display:flex;}
+  .bar{flex:1;height:8px;background:#ebe5d9;border-radius:999px;overflow:hidden;}
+  .bar i{display:block;height:100%;width:0%;border-radius:999px;background:linear-gradient(92deg,var(--accent),var(--accent2));}
+  .clock{font-variant-numeric:tabular-nums;font-size:14px;color:var(--muted);min-width:56px;text-align:right;}
+  .progress.done .bar i{background:var(--ok);}
+  .progress.done .clock{color:var(--ok);font-weight:700;}
+
+  /* ---------- 面板 ---------- */
+  .panel{
+    margin-top:20px;background:#fff;border:1px solid var(--line);
+    border-radius:16px;padding:18px 20px;
+    box-shadow:0 1px 2px rgba(28,34,48,.03), 0 8px 22px rgba(28,34,48,.045);
+  }
+  .panel-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px;}
+  .panel-title{font-family:var(--serif);font-size:15px;font-weight:700;letter-spacing:.04em;}
+  .panel-title em{font-family:var(--jp);font-style:normal;font-size:11.5px;letter-spacing:.1em;color:var(--accent);opacity:.55;margin-left:7px;}
+  .panel-meta{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;}
+  .panel.flush{margin-top:0;margin-bottom:18px;}
+
+  /* 等级 */
+  .lv-row{display:flex;align-items:center;gap:14px;}
+  .lv-badge{
+    flex:0 0 auto;width:52px;height:52px;border-radius:14px;
+    background:linear-gradient(150deg,var(--accent),var(--accent2));
+    color:#fff;display:flex;align-items:center;justify-content:center;
+    font-family:var(--serif);font-size:15px;font-weight:700;letter-spacing:-.01em;
+    box-shadow:0 8px 20px rgba(43,74,120,.22);
+  }
+  .lv-info{flex:1;min-width:0;}
+  .lv-name{font-family:var(--serif);font-size:16px;font-weight:700;margin-bottom:7px;letter-spacing:.04em;}
+  .lv-bar{height:8px;background:#ece7dc;border-radius:999px;overflow:hidden;}
+  .lv-bar i{display:block;height:100%;width:0%;border-radius:999px;background:linear-gradient(92deg,var(--accent),var(--accent2));transition:width .5s ease;}
+  .lv-exp{font-size:12px;color:var(--muted);margin-top:6px;font-variant-numeric:tabular-nums;}
+
+  .ach-title{font-size:12.5px;letter-spacing:.08em;color:var(--muted);margin:18px 0 10px;}
+  .ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;}
+  .ach{
+    display:flex;align-items:flex-start;gap:9px;
+    padding:9px 11px;border-radius:10px;background:#faf9f6;
+    border:1px solid var(--line);opacity:.52;
+  }
+  .ach.on{opacity:1;background:rgba(43,74,120,.05);border-color:rgba(43,74,120,.18);}
+  .ach-dot{
+    flex:0 0 auto;width:9px;height:9px;border-radius:50%;margin-top:4px;
+    background:#d8d3c8;
+  }
+  .ach.on .ach-dot{background:var(--accent);box-shadow:0 0 0 3px rgba(43,74,120,.13);}
+  .ach-txt{min-width:0;}
+  .ach-txt b{display:block;font-size:13px;font-weight:700;letter-spacing:.02em;}
+  .ach-txt i{display:block;font-style:normal;font-size:11px;color:var(--muted);margin-top:2px;line-height:1.45;}
+
+  /* 清单 */
+  .todo-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;}
+  .todo-item{
+    display:flex;align-items:flex-start;gap:10px;
+    padding:9px 11px;border-radius:10px;background:#faf9f6;
+    border:1px solid var(--line);border-left:3px solid #d8d3c8;
+  }
+  .todo-item[data-f="daikichi"]{border-left-color:var(--gold);}
+  .todo-item[data-f="chukichi"],.todo-item[data-f="shokichi"]{border-left-color:var(--seal);}
+  .todo-item[data-f="kichi"]{border-left-color:var(--accent);}
+  .todo-item.done{opacity:.5;}
+  .todo-item.done .todo-text{text-decoration:line-through;}
+  .tick{
+    flex:0 0 auto;width:19px;height:19px;margin-top:1px;padding:0;
+    border-radius:6px;border:1.5px solid #cfc7b6;background:#fff;
+    cursor:pointer;position:relative;transition:.15s ease;
+  }
+  .tick:hover{border-color:var(--accent);}
+  .todo-item.done .tick{background:var(--ok);border-color:var(--ok);}
+  .todo-item.done .tick::after{
+    content:"";position:absolute;left:5.5px;top:1.5px;
+    width:5px;height:10px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(43deg);
+  }
+  .todo-text{flex:1;font-size:14px;line-height:1.55;min-width:0;}
+  .todo-exp{flex:0 0 auto;font-size:11.5px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;margin-top:2px;}
+  .rm{flex:0 0 auto;border:0;background:transparent;color:#b3b7c0;font-size:17px;line-height:1;cursor:pointer;padding:0 3px;font-family:inherit;}
+  .rm:hover{color:var(--seal);}
+  .todo-empty{font-size:13px;color:#b3b7c0;}
+
+  .hist-list{display:flex;flex-wrap:wrap;gap:8px;}
+  .hist-list .item{
+    font-size:12.5px;color:var(--muted);background:#faf9f6;
+    border:1px solid var(--line);border-radius:9px;padding:6px 11px;
+    max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  .hist-list .empty{font-size:13px;color:#b3b7c0;}
+
+  footer{
+    margin-top:26px;padding-top:18px;border-top:1px solid var(--line);
+    font-size:12.5px;color:var(--muted);
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  }
+  footer b{color:var(--seal);font-variant-numeric:tabular-nums;}
+  .foot-right{display:inline-flex;align-items:center;gap:14px;flex-wrap:wrap;}
+  .reset{
+    font-family:inherit;font-size:12px;letter-spacing:.04em;white-space:nowrap;
+    color:#a8adbb;background:transparent;
+    border:1px solid var(--line);border-radius:999px;
+    padding:4px 11px;cursor:pointer;transition:.18s ease;
+  }
+  .reset:hover{color:var(--seal);border-color:rgba(192,69,60,.35);background:rgba(192,69,60,.05);}
+  .reset.arm{color:#fff;background:var(--seal);border-color:var(--seal);}
+  .tap-hint{display:none;}
+
+  /* 升级提示 */
+  .toast{
+    position:fixed;left:50%;bottom:34px;transform:translate(-50%,26px);
+    background:linear-gradient(92deg,var(--accent),var(--accent2));
+    color:#fff;font-size:14px;font-weight:700;letter-spacing:.04em;
+    padding:12px 24px;border-radius:999px;
+    box-shadow:0 14px 34px rgba(43,74,120,.32);
+    opacity:0;pointer-events:none;transition:.32s cubic-bezier(.2,.8,.25,1);
+    z-index:9;
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0);}
+
+  /* ---------- 音效开关 ---------- */
+  .sound{
+    font-family:inherit;font-size:12px;letter-spacing:.04em;white-space:nowrap;
+    color:var(--accent);background:rgba(43,74,120,.06);
+    border:1px solid rgba(43,74,120,.14);border-radius:999px;
+    padding:4px 11px;cursor:pointer;margin-left:12px;flex:0 0 auto;
+    transition:.18s ease;
+  }
+  .sound:hover{background:rgba(43,74,120,.11);}
+  .sound.off{color:#b3b7c0;background:#f4f5f7;border-color:#eceef1;}
+
+  /* ---------- 今日运势 ---------- */
+  .daily-body{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+  .daily-slip{
+    flex:0 0 auto;width:54px;border-radius:6px;
+    background:linear-gradient(180deg,#fffdf6,#faf3e4);
+    border:1.5px solid rgba(192,69,60,.45);
+    padding:10px 6px;display:flex;flex-direction:column;
+    align-items:center;gap:7px;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.7);
+  }
+  .daily-slip b{
+    writing-mode:vertical-rl;text-orientation:upright;
+    font-family:var(--serif);font-size:21px;font-weight:700;
+    letter-spacing:.1em;color:var(--seal);line-height:1;
+  }
+  .daily-slip.f-ki b,.daily-slip.f-sho b{color:var(--accent);}
+  .daily-slip.f-sue b,.daily-slip.f-kyo b{color:#8a8f9c;}
+  .daily-slip i{
+    width:18px;height:18px;border-radius:4px;font-style:normal;
+    background:rgba(192,69,60,.86);color:#fff;font-family:var(--serif);
+    font-size:11px;display:flex;align-items:center;justify-content:center;
+  }
+  .daily-slip.f-sue i,.daily-slip.f-kyo i{background:rgba(138,143,156,.85);}
+  .daily-main{flex:1;min-width:180px;}
+  .daily-jp{font-family:var(--jp);font-size:15.5px;line-height:1.6;font-weight:600;letter-spacing:.02em;}
+  .daily-cn{font-size:13px;color:var(--muted);margin-top:5px;line-height:1.6;}
+  .daily-lucky{display:flex;gap:16px;flex-wrap:wrap;margin-top:11px;font-size:12.5px;color:var(--muted);}
+  .daily-lucky span{display:inline-flex;align-items:center;gap:6px;}
+  .swatch{width:13px;height:13px;border-radius:4px;border:1px solid rgba(0,0,0,.08);}
+  .daily-empty{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:13.5px;color:var(--muted);}
+  .daily-empty .btn{padding:10px 22px;font-size:14px;}
+
+  /* ---------- 连续参拝 + 日历 ---------- */
+  .streak-row{display:flex;align-items:baseline;gap:9px;margin-top:16px;}
+  .streak-num{font-family:var(--serif);font-size:27px;font-weight:700;color:var(--accent);line-height:1;font-variant-numeric:tabular-nums;}
+  .streak-lbl{font-size:12.5px;color:var(--muted);}
+  .streak-lbl em{font-family:var(--jp);font-style:normal;font-size:10.5px;letter-spacing:.08em;opacity:.7;margin-left:5px;}
+  .cal-title{font-size:12.5px;letter-spacing:.08em;color:var(--muted);margin:16px 0 9px;}
+  .cal{display:grid;grid-template-columns:repeat(14,1fr);gap:4px;}
+  .cal i,.cal-legend i{display:block;border-radius:3px;background:rgba(0,0,0,.055);}
+  .cal i{aspect-ratio:1/1;}
+  .cal-legend i{width:11px;height:11px;}
+  .cal i[data-n="1"],.cal-legend i[data-n="1"]{background:var(--accent);opacity:.26;}
+  .cal i[data-n="2"],.cal-legend i[data-n="2"]{background:var(--accent);opacity:.52;}
+  .cal i[data-n="3"],.cal-legend i[data-n="3"]{background:var(--accent);opacity:1;}
+  .cal-legend{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);margin-top:9px;flex-wrap:wrap;}
+  .cal-legend span{display:inline-flex;align-items:center;gap:5px;margin-right:8px;}
+
+  @media (max-width:520px){
+    body{padding:24px 16px 44px;}
+    h1{font-size:27px;}
+    header{padding-right:50px;}
+    .seal{width:36px;height:36px;font-size:20px;}
+    .period-note{display:none;}
+    .result{flex-direction:column;gap:16px;padding:20px 20px 22px;}
+    .slip{
+      width:100%;flex-direction:row;align-items:center;justify-content:flex-start;
+      gap:12px;padding:11px 14px;
+    }
+    .slip-fortune{writing-mode:horizontal-tb;font-size:24px;letter-spacing:.1em;}
+    .slip-seal{width:20px;height:20px;font-size:12px;}
+    .task{font-size:19px;}
+    .tag{padding-right:0;}
+    .pin{position:static;align-self:flex-start;margin-bottom:12px;}
+    .actions .btn{flex:1;padding:13px 14px;}
+    .omikuji{width:112px;height:158px;}
+    .tub{width:88px;height:116px;}
+    .sticks{bottom:106px;}
+    .kbd-hint{display:none;}
+    .tap-hint{display:inline;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="seal">社</div>
+    <div class="kicker">给洋洋的</div>
+    <h1>无聊<span>神社</span></h1>
+    <p class="jp-sub">ひまつぶし神社</p>
+    <p class="sub">洋洋，放假在家别把自己闲坏了。<br>摇一支签，抽到哪件就做哪件。</p>
+  </header>
+
+  <div class="period-bar">
+    <span class="sky" id="sky"></span>
+    <span class="period-jp" id="periodJp">こんにちは</span>
+    <span class="period-note" id="periodNote"></span>
+    <button class="sound" id="sound">音效 开</button>
+  </div>
+
+  <section class="panel flush">
+    <div class="panel-head">
+      <div class="panel-title">今日の運勢<em>きょうのうんせい</em></div>
+      <div class="panel-meta" id="streakMeta">連続参拝 1 日</div>
+    </div>
+    <div class="daily-body" id="dailyBody"></div>
+  </section>
+
+  <div class="chips" id="chips"></div>
+
+  <div class="draw">
+    <div class="omikuji" id="omikuji">
+      <div class="sticks"><i></i><i></i><i></i><i></i></div>
+      <div class="tub"><span>御籤</span></div>
+    </div>
+    <div class="draw-hint" id="drawHint">点下面那个按钮，摇一支</div>
+    <button class="btn primary" id="roll">引く</button>
+  </div>
+
+  <section class="result" id="result">
+    <button class="pin" id="pin" disabled>＋ 钉住</button>
+    <div class="slip" id="slip">
+      <div class="slip-fortune" id="fortune">？</div>
+      <div class="slip-seal">社</div>
+    </div>
+    <div class="result-body">
+      <div class="tag" id="tag"><span class="dot"></span><span id="tagText">等待抽签</span></div>
+      <div class="task idle" id="task">还没抽。摇一支看看今天的运气。</div>
+      <div class="exp-badge" id="expBadge" style="display:none">＋0 EXP</div>
+    </div>
+  </section>
+
+  <div class="actions">
+    <button class="btn ghost" id="timerBtn" disabled>开始计时</button>
+  </div>
+
+  <div class="progress" id="progressWrap">
+    <div class="bar"><i id="bar"></i></div>
+    <div class="clock" id="clock">00:00</div>
+  </div>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div class="panel-title">今天要做的<em>きょうやること</em></div>
+      <div class="panel-meta" id="todoCount">0 / 0</div>
+    </div>
+    <ul class="todo-list" id="todoList"></ul>
+    <div class="todo-empty" id="todoEmpty">还没钉任何事。抽到想做的，点右上角「钉住」，做完打勾拿经验。</div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div class="panel-title">修行の記録<em>しゅぎょう</em></div>
+      <div class="panel-meta" id="doneMeta">已成就 0 件</div>
+    </div>
+    <div class="lv-row">
+      <div class="lv-badge" id="lvBadge">Lv.1</div>
+      <div class="lv-info">
+        <div class="lv-name" id="lvName">見習い</div>
+        <div class="lv-bar"><i id="lvBar"></i></div>
+        <div class="lv-exp" id="lvExp">0 / 60 EXP</div>
+      </div>
+    </div>
+    <div class="streak-row">
+      <span class="streak-num" id="streakNum">1</span>
+      <span class="streak-lbl">連続参拝<em>れんぞくさんぱい</em></span>
+    </div>
+    <div class="cal-title">参拝カレンダー · 直近 28 日</div>
+    <div class="cal" id="cal"></div>
+    <div class="cal-legend">
+      <span><i data-n="0"></i>0 件</span>
+      <span><i data-n="1"></i>1 件</span>
+      <span><i data-n="2"></i>2 件</span>
+      <span><i data-n="3"></i>3 件以上</span>
+    </div>
+    <div class="ach-title">成就</div>
+    <div class="ach-grid" id="achGrid"></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div class="panel-title">刚才翻到过的<em>さっきの</em></div>
+      <div class="panel-meta" id="histMeta">0 条</div>
+    </div>
+    <div class="hist-list" id="hist"><span class="empty">还没有</span></div>
+  </section>
+
+  <footer>
+    <span>硕硕 做的 · 已引 <b id="drawCount">0</b> 支</span>
+    <span class="foot-right">
+      <span class="kbd-hint">按空格键也能摇一支</span>
+      <span class="tap-hint">不想挑就直接点按钮</span>
+      <button class="reset" id="reset" type="button">清空记录</button>
+    </span>
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  var CATS = [
+    {k:'all',    n:'全部',   jp:'ぜんぶ'},
+    {k:'jp',     n:'练日语', jp:'日本語'},
+    {k:'brain',  n:'动脑子', jp:'あたま'},
+    {k:'body',   n:'动身体', jp:'からだ'},
+    {k:'make',   n:'动手做', jp:'てをつかう'},
+    {k:'people', n:'找人玩', jp:'ひとと'},
+    {k:'fun',    n:'随便玩', jp:'きまま'}
+  ];
+
+  /* time: 'morning' | 'night' | 省略＝全天 */
+  var POOL = [
+    /* 练日语 */
+    {t:'背 20 个 N1 单词——真的只背 20 个就停', c:'jp', m:15},
+    {t:'看一集日剧，把字幕关掉', c:'jp', m:25},
+    {t:'手抄一遍五十音图，平假名片假名各一遍', c:'jp', m:15},
+    {t:'跟读一段 NHK 新闻，录下来听自己的发音', c:'jp', m:20},
+    {t:'挑一首日语歌，把歌词里不认识的语法查一遍', c:'jp', m:20},
+    {t:'用日语描述你现在坐的这间屋子，说出 10 样东西', c:'jp', m:10},
+    {t:'找一篇「天声人语」，只读第一段，查完所有生词', c:'jp', m:20},
+    {t:'用日语录一段 1 分钟自我介绍，别写稿', c:'jp', m:10},
+    {t:'看一集《孤独的美食家》，记下 5 个食物相关的词', c:'jp', m:30},
+    {t:'把手机系统语言临时改成日语，撑过一小时', c:'jp', m:60},
+    {t:'学 5 个日语拟声词，想清楚它们分别什么时候用', c:'jp', m:15},
+    {t:'默写一遍动词变形：て形、た形、ない形', c:'jp', m:20},
+    {t:'挑一个敬语场景，尊敬语和谦让语各造 5 句', c:'jp', m:20},
+    {t:'读一篇日语新闻，然后用中文复述一遍给自己听', c:'jp', m:20},
+    {t:'练 10 分钟日语打字，全程用罗马字输入', c:'jp', m:10},
+    {t:'挑一道日式家常菜，把做法和食材名用日语说一遍', c:'jp', m:15},
+    {t:'把「日本語」三个字写到你满意为止', c:'jp', m:10},
+    {t:'用日语给自己录一段「今天最想说的一句话」', c:'jp', m:8, time:'night'},
+    {t:'用日语写三句话日记：今天发生了什么', c:'jp', m:10, time:'night'},
+    {t:'早上用日语对自己说一遍今天要做的事', c:'jp', m:8, time:'morning'},
+
+    /* 动脑子 */
+    {t:'挑一道算法题做，只给自己 15 分钟', c:'brain', m:15},
+    {t:'看一集 3Blue1Brown，挑一个你一直好奇的主题', c:'brain', m:20},
+    {t:'白纸画一遍你最近学的东西，不许查资料', c:'brain', m:15},
+    {t:'读一篇长文章，从头读到尾，不跳段', c:'brain', m:25},
+    {t:'看一段 TED，然后用自己话讲给空气听一遍', c:'brain', m:20},
+    {t:'拿张纸列一下「我现在会什么」，写满 20 条', c:'brain', m:15},
+    {t:'学一个你从来没用过的小工具或新功能', c:'brain', m:20},
+
+    /* 动身体 */
+    {t:'出门走 20 分钟，而且不带耳机', c:'body', m:20},
+    {t:'30 个深蹲 + 20 个俯卧撑，做完就停', c:'body', m:10},
+    {t:'认真拉伸 10 分钟，重点是脖子和肩', c:'body', m:10},
+    {t:'下楼跑 2 公里，跑不动就走完', c:'body', m:20},
+    {t:'洗个澡，然后换一身干净衣服', c:'body', m:20},
+    {t:'出门买瓶水，顺便抬头看看天是什么颜色', c:'body', m:10},
+    {t:'站着把手机举过头顶刷 5 分钟，强制抬头', c:'body', m:5},
+    {t:'出门看一次日出，起得来就去', c:'body', m:30, time:'morning'},
+    {t:'睡前拉伸 5 分钟，然后不要再碰手机', c:'body', m:8, time:'night'},
+
+    /* 动手做 */
+    {t:'做一道从来没做过的菜，食材随便凑', c:'make', m:45},
+    {t:'把衣柜按颜色重新排一遍', c:'make', m:25},
+    {t:'把房间换个布局，哪怕只挪一件家具', c:'make', m:20},
+    {t:'手机相册最近 100 张照片删到 30 张', c:'make', m:10},
+    {t:'手抄一页字，抄什么都行，就是别打字', c:'make', m:12},
+    {t:'养一株绿植，或者给现有的那盆浇浇水换换土', c:'make', m:20},
+    {t:'整理书桌，把半年没碰过的东西收起来', c:'make', m:20},
+    {t:'认真拍一张今天的照片，构图讲究一点', c:'make', m:15},
+    {t:'买一份早餐，坐下来慢慢吃完，别边走边吃', c:'make', m:20, time:'morning'},
+    {t:'把明天的待办写下来，再关灯', c:'make', m:8, time:'night'},
+
+    /* 找人玩 */
+    {t:'给一个很久没联系的朋友发条消息，问她在干嘛', c:'people', m:5},
+    {t:'给家里打个电话，不说事，就闲聊', c:'people', m:15},
+    {t:'找个语伴聊 10 分钟，全程用日语', c:'people', m:10},
+    {t:'在群里发一句「有人吗」，然后等', c:'people', m:3},
+    {t:'约个人这周吃饭，把时间当场定下来', c:'people', m:8},
+    {t:'给朋友推一首你最近单曲循环的歌，说明理由', c:'people', m:5},
+
+    /* 随便玩 */
+    {t:'完整听一张专辑，从头到尾一首都不跳', c:'fun', m:40},
+    {t:'维基百科点「随机条目」，读满 10 分钟', c:'fun', m:10},
+    {t:'用随机数决定今晚吃什么，然后真的去吃', c:'fun', m:5},
+    {t:'挑一部电影，今晚就看，先别看解说', c:'fun', m:15},
+    {t:'地图上随机飞到日本某个小城市，逛 10 分钟街景', c:'fun', m:10},
+    {t:'写 5 条「最近想做的事」，不管多离谱', c:'fun', m:10},
+    {t:'翻出三年前的聊天记录，看 10 分钟', c:'fun', m:10},
+    {t:'找出一张你最喜欢的老照片，讲讲它的故事', c:'fun', m:10},
+    {t:'开窗通风 10 分钟，让房间换口气', c:'fun', m:10, time:'morning'},
+    {t:'抬头找一下月亮，看它今天什么形状', c:'fun', m:5, time:'night'},
+    {t:'听一张安静的专辑，别一边听一边刷手机', c:'fun', m:30, time:'night'}
+  ];
+
+  var FORTUNES = [
+    {k:'daikichi', n:'大吉', w:6,  mul:2.0, cls:'f-dai'},
+    {k:'chukichi', n:'中吉', w:14, mul:1.5, cls:'f-chu'},
+    {k:'shokichi', n:'小吉', w:20, mul:1.2, cls:'f-sho'},
+    {k:'kichi',    n:'吉',   w:28, mul:1.0, cls:'f-ki'},
+    {k:'suekichi', n:'末吉', w:20, mul:0.9, cls:'f-sue'},
+    {k:'kyo',      n:'凶',   w:12, mul:0.8, cls:'f-kyo'}
+  ];
+
+  var TITLES = [
+    {name:'見習い', exp:0},
+    {name:'半人前', exp:60},
+    {name:'一人前', exp:180},
+    {name:'常連',   exp:400},
+    {name:'達人',   exp:800},
+    {name:'師範',   exp:1400},
+    {name:'仙人',   exp:2400}
+  ];
+
+  var ACHS = [
+    {k:'first',   n:'初詣',        d:'引到第一支签'},
+    {k:'dai',     n:'大吉',        d:'抽到一次大吉'},
+    {k:'kyo',     n:'凶でも進む',  d:'完成一个「凶」任务'},
+    {k:'jp5',     n:'日本語の鬼',  d:'完成 5 个练日语任务'},
+    {k:'morning', n:'早起き',      d:'早上（5–10 点）完成一件事'},
+    {k:'night',   n:'夜型',        d:'深夜（23 点后）完成一件事'},
+    {k:'day3',    n:'一日一善',    d:'一天内完成 3 件事'},
+    {k:'t10',     n:'三日坊主卒業',d:'累计完成 10 件事'},
+    {k:'t30',     n:'満願',        d:'累计完成 30 件事'},
+    {k:'daily',   n:'今日の運勢',  d:'抽一次今日运势'},
+    {k:'week7',   n:'七日参り',    d:'连续 7 天来神社'}
+  ];
+
+  /* 今日运势签文 */
+  var DAILY_SENTENCES = [
+    {jp:'今日はいい一日になりそうです。',           cn:'今天会是顺利的一天。'},
+    {jp:'新しいことを始めるのに良い日です。',       cn:'适合开始一件新事的日子。'},
+    {jp:'人に親切にすると、いいことが返ってきます。', cn:'对别人好，好运会绕回来。'},
+    {jp:'焦らずゆっくり進めば大丈夫。',             cn:'别急，慢慢来就没问题。'},
+    {jp:'思いがけない出会いがありそうです。',       cn:'可能会有意外的相遇。'},
+    {jp:'今日は早めに休むのが吉。',                 cn:'今天早点休息最吉。'},
+    {jp:'言葉を選べば、誤解は生まれません。',       cn:'措辞谨慎，就不会有误会。'},
+    {jp:'小さな親切が大きな運を呼びます。',         cn:'小小的善意会带来大运。'},
+    {jp:'迷ったら、直感を信じてください。',         cn:'犹豫的时候，就相信直觉。'},
+    {jp:'空を見上げると、いいアイデアが浮かびます。', cn:'抬头看看天，会有好点子。'},
+    {jp:'今日は学びがはかどる日です。',             cn:'今天是学习效率高的一天。'},
+    {jp:'遠回りこそ近道。寄り道も楽しんで。',       cn:'绕远路才是近路，绕道也要享受。'},
+    {jp:'感謝の言葉を一つ増やすと運が開けます。',   cn:'多说一句谢谢，运气会开。'},
+    {jp:'体を動かすと、心も軽くなります。',         cn:'动动身体，心也会变轻。'},
+    {jp:'今日は誰かに連絡すると吉。',               cn:'今天联系一个人会走运。'},
+    {jp:'一つずつ片付ければ、必ず終わります。',     cn:'一件一件收拾，一定能做完。'},
+    {jp:'新しい言葉を覚えると、世界が広がります。', cn:'学会一个新词，世界就宽一点。'},
+    {jp:'深呼吸を三回。それだけで変わります。',     cn:'深呼吸三次，就不一样了。'},
+    {jp:'今日は写真を撮ると良いことがあります。',   cn:'今天拍张照会有好事。'},
+    {jp:'待つことも、大切な行動です。',             cn:'等待也是一种重要的行动。'}
+  ];
+  var LUCKY_COLORS = [
+    {n:'山吹色', v:'#f0a818'}, {n:'桜色',   v:'#f2b8cd'},
+    {n:'若草色', v:'#8bc34a'}, {n:'空色',   v:'#7ec8e3'},
+    {n:'茜色',   v:'#b03060'}, {n:'藤色',   v:'#b39ddb'},
+    {n:'朱色',   v:'#e04b2a'}, {n:'藍色',   v:'#2b4a78'},
+    {n:'琥珀色', v:'#d9903f'}, {n:'瑠璃色', v:'#2f4b8f'},
+    {n:'白練',   v:'#efe9dd'}, {n:'常磐色', v:'#1f6b52'}
+  ];
+  var LUCKY_ITEMS = ['手帳','カメラ','本','イヤホン','マグカップ','傘','靴','緑茶','観葉植物','手紙','パン','チョコ'];
+
+  /* ---------- 音效：Web Audio 现场合成，不引入任何外部文件 ---------- */
+  var AudioKit = (function(){
+    var ctx = null, enabled = true;
+    function ac(){
+      try{
+        if(!ctx){
+          var C = window.AudioContext || window.webkitAudioContext;
+          if(!C) return null;
+          ctx = new C();
+        }
+        if(ctx.state === 'suspended') ctx.resume();
+        return ctx;
+      }catch(e){ return null; }
+    }
+    function noise(c, dur){
+      var n = Math.max(1, Math.floor(c.sampleRate * dur));
+      var buf = c.createBuffer(1, n, c.sampleRate);
+      var d = buf.getChannelData(0);
+      for(var i=0;i<n;i++) d[i] = (Math.random()*2-1) * (1 - i/n);
+      return buf;
+    }
+    function burst(c, at, dur, freq, q, vol){
+      var s = c.createBufferSource(); s.buffer = noise(c, dur);
+      var f = c.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = q;
+      var g = c.createGain();
+      s.connect(f); f.connect(g); g.connect(c.destination);
+      g.gain.setValueAtTime(0, at);
+      g.gain.linearRampToValueAtTime(vol, at + 0.006);
+      g.gain.exponentialRampToValueAtTime(0.0008, at + dur);
+      s.start(at); s.stop(at + dur + 0.02);
+    }
+    function tone(freq, dur, vol, delay){
+      var c = ac(); if(!c || !enabled) return;
+      var t = c.currentTime + (delay || 0);
+      var o = c.createOscillator(); o.type = 'sine'; o.frequency.value = freq;
+      var g = c.createGain();
+      o.connect(g); g.connect(c.destination);
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(vol, t + 0.008);
+      g.gain.exponentialRampToValueAtTime(0.0008, t + dur);
+      o.start(t); o.stop(t + dur + 0.05);
+    }
+    return {
+      set: function(v){ enabled = !!v; },
+      on: function(){ return enabled; },
+      unlock: function(){ ac(); },
+      /* 摇签：六下沙沙的签条碰撞 */
+      shake: function(){
+        var c = ac(); if(!c || !enabled) return;
+        var t = c.currentTime;
+        for(var i=0;i<6;i++) burst(c, t + i*0.062, 0.05, 1500 + Math.random()*1000, 3, 0.11);
+      },
+      /* 签纸滑出：高频纸响 */
+      paper: function(){
+        var c = ac(); if(!c || !enabled) return;
+        burst(c, c.currentTime, 0.18, 2600, 1.2, 0.07);
+      },
+      /* 完成一件：轻「叮」 */
+      tick: function(){ if(!enabled) return; tone(880, 0.5, 0.09, 0); },
+      /* 大吉：清亮铃音 */
+      dai: function(){
+        if(!enabled) return;
+        tone(1318.5, 1.5, 0.13, 0);
+        tone(1760, 1.3, 0.09, 0.12);
+        tone(2637, 0.9, 0.05, 0.24);
+      },
+      /* 升级：上行四音 */
+      levelUp: function(){
+        if(!enabled) return;
+        [523.25, 659.25, 783.99, 1046.5].forEach(function(f, i){ tone(f, 0.85, 0.10, i*0.11); });
+      }
+    };
+  })();
+
+  var CAT = {};
+  CATS.forEach(function(c){ CAT[c.k] = c; });
+  var FMAP = {};
+  FORTUNES.forEach(function(f){ FMAP[f.k] = f; });
+
+  var $ = function(id){ return document.getElementById(id); };
+  var elChips=$('chips'), elOmikuji=$('omikuji'), elRoll=$('roll'), elHint=$('drawHint');
+  var elResult=$('result'), elSlip=$('slip'), elFortune=$('fortune');
+  var elTask=$('task'), elTagText=$('tagText'), elExp=$('expBadge');
+  var elPin=$('pin'), elTimer=$('timerBtn'), elWrap=$('progressWrap'), elBar=$('bar'), elClock=$('clock');
+  var elTodo=$('todoList'), elTodoCnt=$('todoCount'), elTodoEmp=$('todoEmpty');
+  var elLvBadge=$('lvBadge'), elLvName=$('lvName'), elLvBar=$('lvBar'), elLvExp=$('lvExp'), elDoneMeta=$('doneMeta');
+  var elAch=$('achGrid'), elHist=$('hist'), elHistMeta=$('histMeta');
+  var elDrawCount=$('drawCount'), elToast=$('toast');
+  var elPeriodJp=$('periodJp'), elPeriodNote=$('periodNote');
+  var elSound=$('sound'), elDailyBody=$('dailyBody');
+  var elStreakMeta=$('streakMeta'), elStreakNum=$('streakNum'), elCal=$('cal');
+  var elReset=$('reset');
+
+  var STORE = 'wb_yy2_state';
+  var cat = 'all';
+  var current = null;
+  var prevIdx = -1;
+  var rolling = false;
+  var tickId = null;
+  var hist = [];
+  var period = 'day';
+
+  var state = {
+    exp:0, todo:[], ach:[], draws:0, doneTotal:0, jpDone:0, dayLog:{},
+    dailyDate:'', daily:null, streak:0, lastVisit:''
+  };
+
+  /* ---------- 存取 ---------- */
+  function load(){
+    try{
+      var raw = localStorage.getItem(STORE);
+      if(raw){
+        var o = JSON.parse(raw);
+        if(o && typeof o === 'object'){
+          state.exp = o.exp || 0;
+          state.todo = Array.isArray(o.todo) ? o.todo : [];
+          state.ach = Array.isArray(o.ach) ? o.ach : [];
+          state.draws = o.draws || 0;
+          state.doneTotal = o.doneTotal || 0;
+          state.jpDone = o.jpDone || 0;
+          state.dayLog = (o.dayLog && typeof o.dayLog === 'object') ? o.dayLog : {};
+          state.dailyDate = o.dailyDate || '';
+          state.daily = (o.daily && typeof o.daily === 'object') ? o.daily : null;
+          state.streak = o.streak || 0;
+          state.lastVisit = o.lastVisit || '';
+        }
+      }
+    }catch(e){}
+  }
+  function save(){
+    try{ localStorage.setItem(STORE, JSON.stringify(state)); }catch(e){}
+  }
+
+  /* ---------- 时段 ---------- */
+  var PERIODS = {
+    morning:{jp:'おはようございます', note:'朝の部 · 早上适合轻快的'},
+    day:    {jp:'こんにちは',       note:'昼の部 · 白天做什么都合适'},
+    night:  {jp:'こんばんは',       note:'夜の部 · 晚上的任务温和一点'}
+  };
+  function calcPeriod(){
+    var h = new Date().getHours();
+    if(h >= 5 && h < 10) return 'morning';
+    if(h >= 10 && h < 17) return 'day';
+    return 'night';
+  }
+  function applyPeriod(){
+    var p = calcPeriod();
+    if(p !== period){
+      period = p;
+      document.body.dataset.period = p;
+      elPeriodJp.textContent = PERIODS[p].jp;
+      elPeriodNote.textContent = PERIODS[p].note;
+    }
+  }
+
+  /* ---------- 分类 ---------- */
+  function renderChips(){
+    elChips.innerHTML = '';
+    CATS.forEach(function(c){
+      var b = document.createElement('button');
+      b.className = 'chip' + (c.k === cat ? ' on' : '');
+      b.textContent = c.n;
+      b.addEventListener('click', function(){ cat = c.k; renderChips(); });
+      elChips.appendChild(b);
+    });
+  }
+  function pool(){
+    var base = cat === 'all' ? POOL : POOL.filter(function(x){ return x.c === cat; });
+    return base.filter(function(x){ return !x.time || x.time === period; });
+  }
+
+  /* ---------- 计时 ---------- */
+  function stopTimer(){
+    if(tickId){ clearInterval(tickId); tickId = null; }
+    elWrap.classList.remove('show','done');
+    elBar.style.transition = 'none';
+    elBar.style.width = '0%';
+    elClock.textContent = '00:00';
+  }
+  function fmt(sec){
+    var m = Math.floor(sec/60), s = sec%60;
+    return (m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+  }
+  function startTimer(){
+    if(!current || !current.m) return;
+    stopTimer();
+    var total = current.m * 60, left = total;
+    elWrap.classList.add('show');
+    elClock.textContent = fmt(left);
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        elBar.style.transition = 'width ' + total + 's linear';
+        elBar.style.width = '100%';
+      });
+    });
+    tickId = setInterval(function(){
+      left--;
+      elClock.textContent = fmt(Math.max(left,0));
+      if(left <= 0){
+        clearInterval(tickId); tickId = null;
+        elBar.style.transition = 'none';
+        elBar.style.width = '100%';
+        elWrap.classList.add('done');
+        elClock.textContent = '时间到';
+        elHint.textContent = '时间到 —— 记得回清单打勾拿经验';
+      }
+    }, 1000);
+  }
+
+  /* ---------- 抽签 ---------- */
+  function pickFortune(){
+    var total = 0, i;
+    for(i=0;i<FORTUNES.length;i++) total += FORTUNES[i].w;
+    var r = Math.random()*total, acc = 0;
+    for(i=0;i<FORTUNES.length;i++){
+      acc += FORTUNES[i].w;
+      if(r < acc) return FORTUNES[i];
+    }
+    return FORTUNES[FORTUNES.length-1];
+  }
+  function expOf(m, f){ return Math.max(5, Math.min(120, Math.round(m * f.mul))); }
+
+  function renderSlip(f){
+    elFortune.textContent = f.n;
+    elSlip.className = 'slip ' + f.cls;
+    elResult.classList.toggle('daikichi', f.k === 'daikichi');
+  }
+
+  function show(item, f, isNew){
+    current = {t:item.t, c:item.c, m:item.m, time:item.time, fk:f.k, fn:f.n, exp:expOf(item.m, f)};
+    elTask.classList.remove('idle');
+    elTask.textContent = item.t;
+
+    var c = CAT[item.c];
+    elTagText.textContent = c.n + ' · ' + c.jp + (item.m ? ' · 约 ' + item.m + ' 分钟' : '');
+    var old = document.querySelector('#tag .lim');
+    if(old) old.remove();
+    if(item.time){
+      var lim = document.createElement('span');
+      lim.className = 'lim';
+      lim.textContent = item.time === 'morning' ? '朝限定' : '夜限定';
+      document.getElementById('tag').appendChild(lim);
+    }
+
+    renderSlip(f);
+    elExp.style.display = 'inline-flex';
+    elExp.textContent = '＋' + current.exp + ' EXP';
+    elTimer.disabled = !item.m;
+    elTimer.textContent = '开始计时';
+    stopTimer();
+    syncPin();
+
+    elResult.classList.remove('reveal');
+    void elResult.offsetWidth;
+    elResult.classList.add('reveal');
+    AudioKit.paper();
+
+    if(isNew){
+      hist.unshift(item.t);
+      hist = hist.slice(0,4);
+      renderHist();
+      state.draws++;
+      elDrawCount.textContent = state.draws;
+      unlock('first');
+      if(f.k === 'daikichi') unlock('dai');
+      save();
+    }
+  }
+
+  function roll(){
+    if(rolling) return;
+    var list = pool();
+    if(list.length === 0) return;
+
+    rolling = true;
+    AudioKit.unlock();
+    AudioKit.shake();
+    elOmikuji.classList.remove('shaking');
+    void elOmikuji.offsetWidth;
+    elOmikuji.classList.add('shaking');
+    elTask.classList.add('rolling');
+    elHint.textContent = '摇一摇……';
+
+    var i = 0;
+    var spin = setInterval(function(){
+      elTask.textContent = list[Math.floor(Math.random()*list.length)].t;
+      i++;
+      if(i > 8){
+        clearInterval(spin);
+        var idx = Math.floor(Math.random()*list.length);
+        if(list.length > 1 && idx === prevIdx) idx = (idx+1) % list.length;
+        prevIdx = idx;
+        var f = pickFortune();
+        elTask.classList.remove('rolling');
+        elOmikuji.classList.remove('shaking');
+        elHint.textContent = '抽到就去做，别挑';
+        show(list[idx], f, true);
+        rolling = false;
+        if(f.k === 'daikichi'){ AudioKit.dai(); toast('大吉 —— 好签，去做吧'); }
+      }
+    }, 55);
+  }
+
+  /* ---------- 等级 / 成就 ---------- */
+  function levelInfo(exp){
+    var lv = 1, i;
+    for(i=0;i<TITLES.length;i++){ if(exp >= TITLES[i].exp) lv = i+1; }
+    return {
+      lv: lv,
+      name: TITLES[lv-1].name,
+      cur: TITLES[lv-1].exp,
+      next: lv < TITLES.length ? TITLES[lv].exp : null
+    };
+  }
+  function unlock(k){
+    if(state.ach.indexOf(k) >= 0) return false;
+    state.ach.push(k);
+    var a = null;
+    ACHS.forEach(function(x){ if(x.k === k) a = x; });
+    if(a) toast('成就解锁 · ' + a.n);
+    renderAch();
+    return true;
+  }
+  function renderStatus(){
+    var L = levelInfo(state.exp);
+    elLvBadge.textContent = 'Lv.' + L.lv;
+    elLvName.textContent = L.name;
+    if(L.next === null){
+      elLvBar.style.width = '100%';
+      elLvExp.textContent = state.exp + ' EXP · 已至最高';
+    } else {
+      var span = L.next - L.cur;
+      var pct = span > 0 ? Math.max(0, Math.min(100, (state.exp - L.cur) / span * 100)) : 0;
+      elLvBar.style.width = pct.toFixed(1) + '%';
+      elLvExp.textContent = state.exp + ' / ' + L.next + ' EXP';
+    }
+    elDoneMeta.textContent = '已成就 ' + state.doneTotal + ' 件';
+  }
+  function renderAch(){
+    elAch.innerHTML = '';
+    ACHS.forEach(function(a){
+      var on = state.ach.indexOf(a.k) >= 0;
+      var d = document.createElement('div');
+      d.className = 'ach' + (on ? ' on' : '');
+      d.title = a.d;
+      var dot = document.createElement('span'); dot.className = 'ach-dot';
+      var box = document.createElement('div'); box.className = 'ach-txt';
+      var b = document.createElement('b'); b.textContent = a.n;
+      var i = document.createElement('i'); i.textContent = a.d;
+      box.appendChild(b); box.appendChild(i);
+      d.appendChild(dot); d.appendChild(box);
+      elAch.appendChild(d);
+    });
+  }
+
+  /* ---------- 清单 ---------- */
+  function renderTodo(){
+    elTodo.innerHTML = '';
+    elTodoEmp.style.display = state.todo.length ? 'none' : 'block';
+
+    state.todo.forEach(function(item, i){
+      var li = document.createElement('li');
+      li.className = 'todo-item' + (item.done ? ' done' : '');
+      li.dataset.f = item.fk || 'kichi';
+
+      var tick = document.createElement('button');
+      tick.className = 'tick'; tick.type = 'button';
+      tick.setAttribute('aria-label', item.done ? '标记为未完成' : '标记为完成');
+      tick.addEventListener('click', function(){ toggleDone(i); });
+
+      var sp = document.createElement('span');
+      sp.className = 'todo-text';
+      sp.textContent = item.t;
+
+      var ex = document.createElement('span');
+      ex.className = 'todo-exp';
+      ex.textContent = (item.fn ? item.fn + ' · ' : '') + '＋' + item.exp;
+
+      var rm = document.createElement('button');
+      rm.className = 'rm'; rm.type = 'button'; rm.textContent = '×';
+      rm.setAttribute('aria-label', '从清单移除');
+      rm.addEventListener('click', function(){
+        state.todo.splice(i,1); save(); renderTodo(); syncPin();
+      });
+
+      li.appendChild(tick); li.appendChild(sp); li.appendChild(ex); li.appendChild(rm);
+      elTodo.appendChild(li);
+    });
+
+    var done = state.todo.filter(function(x){ return x.done; }).length;
+    elTodoCnt.textContent = done + ' / ' + state.todo.length;
+  }
+
+  function todayKey(){
+    var d = new Date();
+    return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
+  }
+
+  function toggleDone(i){
+    var item = state.todo[i];
+    if(!item) return;
+
+    if(item.done){
+      item.done = false;
+      state.exp = Math.max(0, state.exp - (item.exp || 0));
+      state.doneTotal = Math.max(0, state.doneTotal - 1);
+      if(item.c === 'jp') state.jpDone = Math.max(0, state.jpDone - 1);
+      var k = todayKey();
+      state.dayLog[k] = Math.max(0, (state.dayLog[k] || 0) - 1);
+      save(); renderTodo(); renderStatus(); renderCal(); syncPin();
+      return;
+    }
+
+    var before = levelInfo(state.exp).lv;
+    item.done = true;
+    state.exp += item.exp || 0;
+    state.doneTotal++;
+    if(item.c === 'jp') state.jpDone++;
+
+    var key = todayKey();
+    state.dayLog[key] = (state.dayLog[key] || 0) + 1;
+
+    var h = new Date().getHours();
+    if(h >= 5 && h < 10) unlock('morning');
+    if(h >= 23 || h < 5) unlock('night');
+    if(state.dayLog[key] >= 3) unlock('day3');
+    if(item.fk === 'kyo') unlock('kyo');
+    if(state.jpDone >= 5) unlock('jp5');
+    if(state.doneTotal >= 10) unlock('t10');
+    if(state.doneTotal >= 30) unlock('t30');
+
+    save(); renderTodo(); renderStatus(); renderAch(); renderCal(); syncPin();
+
+    var after = levelInfo(state.exp);
+    if(after.lv > before) setTimeout(function(){
+      AudioKit.levelUp();
+      toast('升到 Lv.' + after.lv + ' · ' + after.name);
+    }, 260);
+  }
+
+  function isPinned(t){
+    return state.todo.some(function(x){ return x.t === t; });
+  }
+  function syncPin(){
+    if(!current){ elPin.disabled = true; elPin.textContent = '＋ 钉住'; return; }
+    if(isPinned(current.t)){
+      elPin.disabled = true; elPin.textContent = '已在清单';
+    } else {
+      elPin.disabled = false; elPin.textContent = '＋ 钉住';
+    }
+  }
+
+  /* ---------- 历史 ---------- */
+  function renderHist(){
+    elHist.innerHTML = '';
+    elHistMeta.textContent = hist.length + ' 条';
+    if(!hist.length){
+      var s = document.createElement('span');
+      s.className = 'empty'; s.textContent = '还没有';
+      elHist.appendChild(s); return;
+    }
+    hist.forEach(function(t){
+      var d = document.createElement('span');
+      d.className = 'item'; d.textContent = t;
+      elHist.appendChild(d);
+    });
+  }
+
+  /* ---------- 今日运势 ---------- */
+  function renderDaily(){
+    var drawn = state.dailyDate === todayKey() && state.daily;
+    elDailyBody.innerHTML = '';
+    if(!drawn){
+      var wrap = document.createElement('div');
+      wrap.className = 'daily-empty';
+      var t = document.createElement('span');
+      t.textContent = '今天的签还没抽。一天一次，抽完就等明天。';
+      var b = document.createElement('button');
+      b.className = 'btn primary'; b.type = 'button'; b.textContent = '引く';
+      b.addEventListener('click', drawDaily);
+      wrap.appendChild(t); wrap.appendChild(b);
+      elDailyBody.appendChild(wrap);
+      return;
+    }
+    var d = state.daily;
+    var slip = document.createElement('div');
+    slip.className = 'daily-slip' + (FMAP[d.fk] ? ' ' + FMAP[d.fk].cls : '');
+    var b1 = document.createElement('b'); b1.textContent = d.fn;
+    var i1 = document.createElement('i'); i1.textContent = '社';
+    slip.appendChild(b1); slip.appendChild(i1);
+
+    var main = document.createElement('div'); main.className = 'daily-main';
+    var jp = document.createElement('div'); jp.className = 'daily-jp'; jp.textContent = d.jp;
+    var cn = document.createElement('div'); cn.className = 'daily-cn'; cn.textContent = d.cn;
+    var lk = document.createElement('div'); lk.className = 'daily-lucky';
+    var s1 = document.createElement('span');
+    var sw = document.createElement('i'); sw.className = 'swatch'; sw.style.background = d.colorV;
+    s1.appendChild(document.createTextNode('幸運色 '));
+    s1.appendChild(sw);
+    s1.appendChild(document.createTextNode(d.color));
+    var s2 = document.createElement('span'); s2.textContent = '幸運物 ' + d.item;
+    lk.appendChild(s1); lk.appendChild(s2);
+    main.appendChild(jp); main.appendChild(cn); main.appendChild(lk);
+
+    elDailyBody.appendChild(slip);
+    elDailyBody.appendChild(main);
+  }
+
+  function drawDaily(){
+    if(state.dailyDate === todayKey()) return;
+    var f = pickFortune();
+    var s = DAILY_SENTENCES[Math.floor(Math.random()*DAILY_SENTENCES.length)];
+    var col = LUCKY_COLORS[Math.floor(Math.random()*LUCKY_COLORS.length)];
+    var it = LUCKY_ITEMS[Math.floor(Math.random()*LUCKY_ITEMS.length)];
+    state.dailyDate = todayKey();
+    state.daily = {fk:f.k, fn:f.n, jp:s.jp, cn:s.cn, color:col.n, colorV:col.v, item:it};
+    AudioKit.unlock();
+    AudioKit.paper();
+    if(f.k === 'daikichi') AudioKit.dai();
+    unlock('daily');
+    save();
+    renderDaily();
+    toast('今日の運勢 · ' + f.n);
+  }
+
+  /* ---------- 连续参拝 ---------- */
+  function dayKeyOffset(off){
+    var d = new Date();
+    d.setDate(d.getDate() + off);
+    return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
+  }
+  function updateStreak(){
+    var today = todayKey();
+    if(state.lastVisit === today) return;
+    state.streak = (state.lastVisit === dayKeyOffset(-1)) ? (state.streak || 0) + 1 : 1;
+    state.lastVisit = today;
+    if(state.streak >= 7) unlock('week7');
+    save();
+  }
+  function renderStreak(){
+    var n = state.streak || 1;
+    elStreakNum.textContent = n;
+    elStreakMeta.textContent = '連続参拝 ' + n + ' 日';
+  }
+  function renderCal(){
+    elCal.innerHTML = '';
+    for(var i=27;i>=0;i--){
+      var k = dayKeyOffset(-i);
+      var n = state.dayLog[k] || 0;
+      var cell = document.createElement('i');
+      cell.dataset.n = n >= 3 ? '3' : (n === 2 ? '2' : (n === 1 ? '1' : '0'));
+      var p = k.split('-');
+      cell.title = p[1] + '/' + p[2] + ' · 完成 ' + n + ' 件';
+      elCal.appendChild(cell);
+    }
+  }
+
+  /* ---------- 音效开关 ---------- */
+  var SOUND_KEY = 'wb_yy2_sound';
+  function applySound(){
+    elSound.textContent = AudioKit.on() ? '音效 开' : '音效 关';
+    elSound.classList.toggle('off', !AudioKit.on());
+  }
+  function initSound(){
+    var on = true;
+    try{ if(localStorage.getItem(SOUND_KEY) === '0') on = false; }catch(e){}
+    AudioKit.set(on);
+    applySound();
+    elSound.addEventListener('click', function(){
+      var next = !AudioKit.on();
+      AudioKit.set(next);
+      try{ localStorage.setItem(SOUND_KEY, next ? '1' : '0'); }catch(e){}
+      applySound();
+      if(next){ AudioKit.unlock(); AudioKit.tick(); }
+    });
+  }
+
+  /* ---------- 清空记录 ---------- */
+  function resetAll(){
+    state.exp = 0; state.todo = []; state.ach = []; state.draws = 0;
+    state.doneTotal = 0; state.jpDone = 0; state.dayLog = {};
+    state.dailyDate = ''; state.daily = null; state.streak = 0; state.lastVisit = '';
+    try{ localStorage.removeItem(STORE); }catch(e){}
+    updateStreak();   /* 重新记成「今天来过」，連続 1 日 */
+
+    cat = 'all'; rolling = false; prevIdx = -1; current = null; hist = [];
+
+    elTask.classList.add('idle');
+    elTask.textContent = '还没抽。摇一支看看今天的运气。';
+    elFortune.textContent = '？';
+    elSlip.className = 'slip';
+    elResult.classList.remove('daikichi', 'reveal');
+    elTagText.textContent = '等待抽签';
+    var lim = document.querySelector('#tag .lim');
+    if(lim) lim.remove();
+    elExp.style.display = 'none';
+    elTimer.disabled = true;
+    elTimer.textContent = '开始计时';
+    stopTimer();
+    elHint.textContent = '点下面那个按钮，摇一支';
+    elDrawCount.textContent = '0';
+
+    save();
+    renderChips(); renderHist(); renderTodo(); renderStatus();
+    renderAch(); renderDaily(); renderStreak(); renderCal(); syncPin();
+    toast('已清空，从头再来');
+  }
+
+  var resetTid = null;
+  function initReset(){
+    elReset.addEventListener('click', function(){
+      if(elReset.classList.contains('arm')){
+        if(resetTid){ clearTimeout(resetTid); resetTid = null; }
+        elReset.classList.remove('arm');
+        elReset.textContent = '清空记录';
+        resetAll();
+        return;
+      }
+      elReset.classList.add('arm');
+      elReset.textContent = '再点一次确认';
+      if(resetTid) clearTimeout(resetTid);
+      resetTid = setTimeout(function(){
+        resetTid = null;
+        elReset.classList.remove('arm');
+        elReset.textContent = '清空记录';
+      }, 4000);
+    });
+  }
+
+  /* ---------- 提示 ---------- */
+  var toastTid = null;
+  function toast(msg){
+    elToast.textContent = msg;
+    elToast.classList.add('show');
+    if(toastTid) clearTimeout(toastTid);
+    toastTid = setTimeout(function(){ elToast.classList.remove('show'); }, 2600);
+  }
+
+  /* ---------- 事件 ---------- */
+  elRoll.addEventListener('click', roll);
+  elTimer.addEventListener('click', startTimer);
+  elPin.addEventListener('click', function(){
+    if(!current || isPinned(current.t)) return;
+    state.todo.push({
+      t: current.t, c: current.c, m: current.m,
+      fk: current.fk, fn: current.fn, exp: current.exp, done: false
+    });
+    save(); renderTodo(); syncPin();
+    toast('已钉住 · 做完打勾拿 ' + current.exp + ' EXP');
+  });
+
+  document.addEventListener('keydown', function(e){
+    var tag = (e.target && e.target.tagName) || '';
+    if(tag === 'INPUT' || tag === 'TEXTAREA') return;
+    if(e.code === 'Space'){ e.preventDefault(); roll(); }
+  });
+
+  /* ---------- 启动 ---------- */
+  load();
+  initSound();
+  initReset();
+  period = calcPeriod();
+  document.body.dataset.period = period;
+  elPeriodJp.textContent = PERIODS[period].jp;
+  elPeriodNote.textContent = PERIODS[period].note;
+  elDrawCount.textContent = state.draws;
+
+  updateStreak();
+
+  renderChips();
+  renderHist();
+  renderTodo();
+  renderStatus();
+  renderAch();
+  renderDaily();
+  renderStreak();
+  renderCal();
+  syncPin();
+
+  setInterval(applyPeriod, 60000);
+
+  /* 调试出口（供自动化验收读取内部状态，不影响使用） */
+  window.__kit = {
+    FORTUNES: FORTUNES, TITLES: TITLES, ACHS: ACHS, POOL: POOL,
+    DAILY_SENTENCES: DAILY_SENTENCES, LUCKY_COLORS: LUCKY_COLORS,
+    pickFortune: pickFortune, expOf: expOf, levelInfo: levelInfo,
+    unlock: unlock, state: state, calcPeriod: calcPeriod, save: save,
+    todayKey: todayKey, dayKeyOffset: dayKeyOffset,
+    drawDaily: drawDaily, updateStreak: updateStreak, AudioKit: AudioKit,
+    resetAll: resetAll,
+    refresh: function(){
+      renderTodo(); renderStatus(); renderAch();
+      renderDaily(); renderStreak(); renderCal(); syncPin();
+    }
+  };
+})();
+</script>
+</body>
+</html>
